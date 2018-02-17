@@ -11,5 +11,10 @@
             "name": "Götz Gottwald",
             "email": "goetz.gottwald@gmx.net"
         }
-    ]
+    ],
+    "autoload": {
+        "psr-4": {
+            "MiIO\\": "src/"
+        }
+    }
 }
