@@ -3,7 +3,7 @@
     "description": "Control Xiaomi Mi Home devices",
     "type": "library",
     "require": {
-        "php": "7.0"
+        "php": ">=7.0"
     },
     "license": "GNU AFFERO GENERAL PUBLIC LICENSE",
     "authors": [
