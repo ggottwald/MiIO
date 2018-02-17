@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Modules\MiIO\Models;
+namespace MiIO\Models;
 
-use App\Modules\MiIO\Crypt;
+use MiIO\Crypt;
 
 /**
  * Class Device
  *
- * @package App\Modules\MiIO\Models
+ * @package MiIO\Models
  */
 class Device
 {

@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Modules\MiIO\Models;
+namespace MiIO\Models;
 
 /**
  * Class Request
  *
- * @package App\Modules\MiIO\Models
+ * @package MiIO\Models
  */
 class Request
 {
