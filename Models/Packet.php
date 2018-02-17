@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Modules\MiIO\Models;
+namespace MiIO\Models;
 
 /**
  * Class Packet
  *
  * Container all hex strings of request and response
  *
- * @package App\Modules\MiIO\Models
+ * @package MiIO\Models
  */
 class Packet
 {

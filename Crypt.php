@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Modules\MiIO;
+namespace MiIO;
 
 class Crypt
 {

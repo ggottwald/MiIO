@@ -1,15 +1,15 @@
 <?php
 
-namespace App\Modules\MiIO;
+namespace MiIO;
 
-use App\Modules\MiIO\Models\Device;
-use App\Modules\MiIO\Models\Packet;
-use App\Modules\MiIO\Models\Request;
+use MiIO\Models\Device;
+use MiIO\Models\Packet;
+use MiIO\Models\Request;
 
 /**
  * Class MiIO
  *
- * @package App\Modules\MiIO
+ * @package MiIO
  */
 class MiIO
 {
