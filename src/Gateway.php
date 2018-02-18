@@ -24,8 +24,8 @@ class Gateway
     {
         $hexValue = $this->getRgbAndBrightness($device);
 
-        if (strlen($hexValue) == 8) {
-            return substr($hexValue, 2);
+        if (strlen($hexValue) >= 7) {
+            return strrev(substr(strrev($hexValue), 0, 6));
         }
 
         return null;
@@ -41,7 +41,7 @@ class Gateway
             $value = dechex($value);
         }
 
-        $bright = $this->getBrightness($device);
+        $bright = $this->getBrightness($device) ?? '01';
 
         $this->miIO->send($device, 'set_rgb', [hexdec($bright . $value)]);
     }
@@ -54,8 +54,8 @@ class Gateway
     {
         $hexValue = $this->getRgbAndBrightness($device);
 
-        if (strlen($hexValue) == 8) {
-            return substr($hexValue, 0, 2);
+        if (strlen($hexValue) >= 7) {
+            return strrev(substr(strrev($hexValue), 6));
         }
 
         return null;
@@ -71,7 +71,7 @@ class Gateway
             $value = dechex($value);
         }
 
-        $rgb = $this->getRgb($device);
+        $rgb = $this->getRgb($device) ?? 'ffffff';
 
         $this->miIO->send($device, 'set_rgb', [hexdec($value . $rgb)]);
     }
@@ -80,7 +80,7 @@ class Gateway
      * @param Device $device
      * @return string|null
      */
-    public function getRgbAndBrightness(Device $device)
+    public function getBrightnessAndRgb(Device $device)
     {
         $response = $this->miIO->send($device, 'get_prop', ['rgb']);
 
@@ -95,7 +95,7 @@ class Gateway
      * @param Device     $device
      * @param int|string $value
      */
-    public function setRgbAndBrightness(Device $device, $value)
+    public function setBrightnessAndRgb(Device $device, $value)
     {
         if (preg_match('/^[0-9a-f]{8}$/i', $value) !== false) {
             $value = hexdec($value);
