@@ -74,7 +74,7 @@ trait Light
      */
     public function setBrightness(Device $device, $value)
     {
-        $bright = dechex(round($value * 2.55));
+        $bright = dechex($value);
         $rgb = $this->getRgb($device) ?? 'ffffff';
 
         $this->miIO->send($device, 'set_rgb', [hexdec($bright . $rgb)]);
