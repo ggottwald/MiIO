@@ -92,13 +92,16 @@ trait Light
     {
         $this->miIO->send($device, 'get_prop', ['rgb']);
 
-        return $this->miIO->read($device)->done(function ($response) {
-            if ($response instanceof Response) {
-                return dechex($response->getResult()[0]);
-            }
+        return $this->miIO->read($device)
+            ->done(function ($response) {
+                if ($response instanceof Response) {
+                    return dechex($response->getResult()[0]);
+                }
 
-            return null;
-        });
+                return null;
+            }, function ($rejected) {
+                // TODO: error handling
+            });
     }
 
     /**
