@@ -88,10 +88,13 @@ class Device
 
     /**
      * @param string $name
+     * @return Device
      */
     public function setName(string $name)
     {
         $this->name = $name;
+
+        return $this;
     }
 
     /**
