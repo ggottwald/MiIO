@@ -4,6 +4,8 @@ namespace MiIO\Traits;
 
 use MiIO\MiIO;
 use MiIO\Models\Device;
+use MiIO\Models\Response;
+use Socket\Raw\Factory;
 
 trait Light
 {
@@ -14,7 +16,7 @@ trait Light
 
     public function __construct()
     {
-        $this->miIO = new MiIO();
+        $this->miIO = new MiIO(new Factory());
     }
 
     /**
@@ -88,13 +90,15 @@ trait Light
      */
     public function getBrightnessAndRgb(Device $device)
     {
-        $response = $this->miIO->send($device, 'get_prop', ['rgb']);
+        $this->miIO->send($device, 'get_prop', ['rgb']);
 
-        if (isset($response['result'][0])) {
-            return dechex($response['result'][0]);
-        }
+        return $this->miIO->read($device)->done(function ($response) {
+            if ($response instanceof Response) {
+                return dechex($response->getResult()[0]);
+            }
 
-        return null;
+            return null;
+        });
     }
 
     /**
