@@ -3,20 +3,17 @@ With this package you can control Xiaomi Mi Home devices that implement the miIO
 Mi Robot Vacuum and other Smart Home devices.
 These devices are commonly part of what Xiaomi calls the Mi Ecosystem which is branded as MiJia.
 
-# Example
+# Example for Laravel
 Get device info, status and start cleaning of mi robot vacuum
 
-    $device = new Device();
+    $miio = app(MiIO::class);
     
-    $device
-        ->setDeviceName('mirobot_vacuum')
-        ->setToken('00112233445566778899aabbccddeeff');
-        
-    $miio = new MiIO();
+    $device = $miio->createDevice('mirobot_vacuum', '00112233445566778899aabbccddeeff');
     
-    $deviceInfoResult = $miio->getInfo($device);
-    
-    $statusResult = $miio->send($device, 'get_status');
+    $miio->send($device, 'get_status');
+    $miio->read($device)->done(function($response) {
+        $response->getResult();
+    });
     
     $miio->send($device, 'app_start'); // start cleaning
     

@@ -5,6 +5,9 @@ namespace MiIO;
 use MiIO\Models\Device;
 use MiIO\Models\Packet;
 use MiIO\Models\Request;
+use MiIO\Models\Response;
+use React\Promise\Promise;
+use Socket\Raw\Factory;
 
 /**
  * Class MiIO
@@ -15,19 +18,37 @@ class MiIO
 {
     const CACHE_KEY = 'MiIO';
 
-    const PORT = 54321;
-
-    const TIMEOUT = 5;
-
     const INFO = 'miIO.info';
 
     /**
+     * @var Factory
+     */
+    protected $socketFactory;
+
+    public function __construct(Factory $socketFactory)
+    {
+        $this->socketFactory = $socketFactory;
+    }
+
+    /**
+     * @param string $deviceName
+     * @param string $token
+     * @return Device
+     */
+    public function createDevice(string $deviceName, string $token)
+    {
+        return new Device($this->socketFactory->createUdp4(), $deviceName, $token);
+    }
+
+    /**
      * @param Device $device
-     * @return array
+     * @return Promise
      */
     public function getInfo(Device $device)
     {
-        return $this->send($device, static::INFO);
+        $this->send($device, static::INFO);
+
+        return $this->read($device);
     }
 
     /**
@@ -36,46 +57,36 @@ class MiIO
      */
     private function init(Device &$device)
     {
-        if (strlen($device->getIpAddress())) {
-            $packet = new Packet();
-            $helo = $packet->getHelo();
+        $packet = new Packet();
+        $helo = $packet->getHelo();
 
-            $start = time();
-            $socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
+        $device->send($helo);
+        $response = $device->read();
 
-            while (time() < ($start + 10)) {
-                $response = $this->getSocketResponse($device->getIpAddress(), $socket, $helo);
+        if (!empty($response)) {
+            $response = bin2hex($response);
+        }
 
-                if (!empty($response)) {
-                    $response = bin2hex($response);
-                }
+        if (!empty($response)) {
 
-                if (!empty($response)) {
-                    $packet = new Packet($response);
-                    if ($packet->getDeviceType()
-                        && $packet->getSerial()) {
-                        $device->setDeviceType($packet->getDeviceType());
-                        $device->setSerial($packet->getSerial());
-                        $device->setTimeDelta(hexdec($packet->getTimestamp()) - time());
-                        socket_close($socket);
+            $packet = new Packet($response);
 
-                        return $device;
-                    }
-                }
-            }
-            if ($socket) {
-                socket_close($socket);
+            if ($packet->getDeviceType()
+                && $packet->getSerial()) {
+
+                $device->setDeviceType($packet->getDeviceType());
+                $device->setSerial($packet->getSerial());
+                $device->setTimeDelta(hexdec($packet->getTimestamp()) - time());
             }
         }
 
-        return null;
+        return $device;
     }
 
     /**
      * @param Device $device
      * @param string $command
      * @param array  $params
-     * @return array
      */
     public function send(Device $device, $command, $params = [])
     {
@@ -83,30 +94,14 @@ class MiIO
             $this->init($device);
         }
 
-        if (!$device->isInitialized()) {
-            return [];
-        }
+        $cacheKey = static::CACHE_KEY . $device->getIpAddress();
+        $requestId = \Cache::increment($cacheKey);
 
         $request = new Request();
         $request
             ->setMethod($command)
-            ->setParams($params);
-
-        return $this->getResponse($device, $request);
-    }
-
-    /**
-     * @param Device  $device
-     * @param Request $request
-     * @return array
-     */
-    public function getResponse(Device $device, Request $request)
-    {
-        $cacheKey = static::CACHE_KEY . $device->getIpAddress();
-        $requestId = (int)\Cache::get($cacheKey);
-        \Cache::forever($cacheKey, $requestId + 1);
-
-        $request->setId($requestId);
+            ->setParams($params)
+            ->setId($requestId);
 
         $data = $device->encrypt($request);
 
@@ -115,73 +110,35 @@ class MiIO
             ->setData($data)
             ->setDevice($device);
 
-        $start = time();
-        $socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
-
-        while (time() < ($start + 10)) {
-            $packet->setTimestamp($device->getTimeDelta() + time());
-            $response = $this->getSocketResponse($device->getIpAddress(), $socket, (string)$packet);
-
-            if (!empty($response)) {
-                $response = bin2hex($response);
-            }
-
-            $result = $this->decrypt($device, $response);
-
-            if (strlen($result)) {
-                $response = json_decode(preg_replace('/[\x00-\x1F\x7F]/', '', $result), true);
-
-                if (!empty($response['id']) && $response['id'] === $requestId) {
-                    socket_close($socket);
-
-                    return $response;
-                }
-            }
-        }
-
-        return [];
-    }
-
-    /**
-     * @param string    $ip
-     * @param \Resource $socket
-     * @param string    $data
-     * @return string|null
-     */
-    private function getSocketResponse($ip, $socket, $data)
-    {
-        if (ctype_xdigit($data)) {
-            $data = hex2bin($data);
-        }
-
-        $buf = null;
-
-        try {
-            socket_set_option($socket, SOL_SOCKET, SO_BROADCAST, 1);
-            socket_set_option($socket, SOL_SOCKET, SO_RCVTIMEO, ['sec' => 5, 'usec' => 0]);
-
-            socket_sendto($socket, $data, strlen($data), 0, $ip, static::PORT);
-
-            socket_recvfrom($socket, $buf, 1024, 0, $name, $port);
-        } catch (\Throwable $e) {
-        }
-
-        return $buf;
+        $device->send((string)$packet);
     }
 
     /**
      * @param Device $device
-     * @param string $response
-     * @return string
+     * @return Promise
      */
-    private function decrypt(Device $device, $response)
+    public function read(Device $device)
     {
-        if (!empty($response)) {
-            $packet = new Packet($response);
+        return new Promise(function (callable $resolve, callable $reject) use ($device) {
+            $buf = $device->read();
 
-            return $device->decrypt($packet->getData());
-        }
+            if (!empty($buf)) {
+                $buf = bin2hex($buf);
+            }
 
-        return '';
+            $packet = new Packet($buf);
+            $result = $device->decrypt($packet->getData());
+
+            $response = new Response(
+                json_decode(preg_replace('/[\x00-\x1F\x7F]/', '', $result), true)
+            );
+
+            if ($response->isSuccess()) {
+                $resolve($response);
+
+                return;
+            }
+            $reject($response->getException());
+        });
     }
 }
