@@ -324,10 +324,12 @@ class Device
             $data = hex2bin($data);
         }
 
+        $remote = $this->getRemote();
+
         $this->socket
             ->setOption(SOL_SOCKET, SO_BROADCAST, 1)
             ->setOption(SOL_SOCKET, SO_RCVTIMEO, ['sec' => 5, 'usec' => 0])
-            ->sendTo($data, 0, $this->getRemote());
+            ->sendTo($data, 0, $remote);
     }
 
     /**
@@ -335,8 +337,6 @@ class Device
      */
     public function read()
     {
-        $remote = $this->getRemote();
-
         return $this->socket->recvFrom(self::PACKET_LENGTH, 0, $remote);
     }
 }
