@@ -11,271 +11,275 @@ namespace MiIO\Models;
  */
 class Packet
 {
-	const MAGIC = '2131';
+    const MAGIC = '2131';
 
-	/**
-	 * @var string
-	 */
-	private $header;
+    /**
+     * @var string
+     */
+    private $header;
 
-	/**
-	 * @var string
-	 */
-	private $magic;
+    /**
+     * @var string
+     */
+    private $magic;
 
-	/**
-	 * @var string
-	 */
-	private $length;
+    /**
+     * @var string
+     */
+    private $length;
 
-	/**
-	 * @var string
-	 */
-	private $unknown;
+    /**
+     * @var string
+     */
+    private $unknown;
 
-	/**
-	 * @var string
-	 */
-	private $timestamp;
+    /**
+     * @var string
+     */
+    private $timestamp;
 
-	/**
-	 * @var string
-	 */
-	private $checksum;
+    /**
+     * @var string
+     */
+    private $checksum;
 
-	/**
-	 * @var string
-	 */
-	private $deviceId;
+    /**
+     * @var string
+     */
+    private $deviceId;
 
-	/**
-	 * @var string
-	 */
-	private $deviceType;
+    /**
+     * @var string
+     */
+    private $deviceType;
 
-	/**
-	 * @var string
-	 */
-	private $serial;
+    /**
+     * @var string
+     */
+    private $serial;
 
-	/**
-	 * @var string
-	 */
-	private $data;
+    /**
+     * @var string
+     */
+    private $data;
 
-	/**
-	 * @var string
-	 */
-	private $token;
+    /**
+     * @var string
+     */
+    private $token;
 
-	public function __construct($data = '')
-	{
-		$this->magic = static::MAGIC;
-		$this->unknown = str_pad('', 8, '0');
-		$this->checksum = str_pad('', 32, 'F');
-		$this->setDeviceId(str_pad('', 8, 'F'));
-		$this->setTimestamp(time());
+    public function __construct($data = '')
+    {
+        $this->magic = static::MAGIC;
+        $this->unknown = str_pad('', 8, '0');
+        $this->checksum = str_pad('', 32, 'F');
+        $this->setDeviceId(str_pad('', 8, 'F'));
+        $this->setTimestamp(time());
 
-		if (is_string($data)
-			&& strlen($data)) {
-			if (!ctype_xdigit($data)) {
-				$data = bin2hex($data);
-			}
+        if (is_string($data)
+            && strlen($data)) {
+            if (!ctype_xdigit($data)) {
+                $data = bin2hex($data);
+            }
 
-			if (strlen($data) >= 64
-				&& ctype_xdigit($data)
-				&& strpos($data, static::MAGIC) === 0) {
-				// raw data
-				$this->setRAW($data);
-			}
-		}
-	}
+            if (strlen($data) >= 64
+                && ctype_xdigit($data)
+                && strpos($data, static::MAGIC) === 0) {
+                // raw data
+                $this->setRAW($data);
+            }
+        }
+    }
 
-	/**
-	 * @param string $raw
-	 * @return $this
-	 */
-	public function setRAW($raw)
-	{
-		if (strlen($raw) > 32) {
-			$this->header = substr($raw, 0, 32);
-			$this->magic = substr($raw, 0, 4);
-			$this->length = substr($raw, 4, 4);
-			$this->unknown = substr($raw, 8, 8);
-			$this->deviceId = substr($raw, 16, 8);
-			$this->deviceType = substr($raw, 16, 4);
-			$this->serial = substr($raw, 20, 4);
-			$this->timestamp = substr($raw, 24, 8);
-			$this->checksum = substr($raw, 32, 32);
-			$this->data = substr($raw, 64);
-		}
+    /**
+     * @param string $raw
+     * @return $this
+     */
+    public function setRAW($raw)
+    {
+        if (strlen($raw) > 32) {
+            $this->header = substr($raw, 0, 32);
+            $this->magic = substr($raw, 0, 4);
+            $this->length = substr($raw, 4, 4);
+            $this->unknown = substr($raw, 8, 8);
+            $this->deviceId = substr($raw, 16, 8);
+            $this->deviceType = substr($raw, 16, 4);
+            $this->serial = substr($raw, 20, 4);
+            $this->timestamp = substr($raw, 24, 8);
+            $this->checksum = substr($raw, 32, 32);
+            $this->data = substr($raw, 64);
+        }
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * @param string $token
-	 * @return $this
-	 */
-	public function setToken($token)
-	{
-		$this->token = $token;
+    /**
+     * @param string $token
+     * @return $this
+     */
+    public function setToken($token)
+    {
+        $this->token = $token;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * @param int|string $timestamp
-	 * @return $this
-	 */
-	public function setTimestamp($timestamp)
-	{
-		if ($timestamp && ctype_xdigit($timestamp) && strlen($timestamp) == 8) {
-			$this->timestamp = $timestamp;
-		} else {
-			$this->timestamp = str_pad(dechex($timestamp), 8, '0', STR_PAD_LEFT);
-		}
+    /**
+     * @param int|string $timestamp
+     * @return $this
+     */
+    public function setTimestamp($timestamp)
+    {
+        if ($timestamp && ctype_xdigit($timestamp) && strlen($timestamp) == 8) {
+            $this->timestamp = $timestamp;
+        } else {
+            $this->timestamp = str_pad(dechex($timestamp), 8, '0', STR_PAD_LEFT);
+        }
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * @param string $deviceId
-	 * @return $this
-	 */
-	public function setDeviceId($deviceId)
-	{
-		$this->deviceId = $deviceId;
-		$this->deviceType = substr($this->deviceId, 0, 4);
-		$this->serial = substr($this->deviceId, 4, 4);
+    /**
+     * @param string $deviceId
+     * @return $this
+     */
+    public function setDeviceId($deviceId)
+    {
+        $this->deviceId = $deviceId;
+        $this->deviceType = substr($this->deviceId, 0, 4);
+        $this->serial = substr($this->deviceId, 4, 4);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	public function getDeviceId()
-	{
-		return $this->deviceId;
-	}
+    public function getDeviceId()
+    {
+        return $this->deviceId;
+    }
 
-	/**
-	 * @param string $deviceType
-	 * @return $this
-	 */
-	public function setDeviceType($deviceType)
-	{
-		$this->deviceType = $deviceType;
-		$this->deviceId = $this->deviceType . $this->serial;
+    /**
+     * @param string $deviceType
+     * @return $this
+     */
+    public function setDeviceType($deviceType)
+    {
+        $this->deviceType = $deviceType;
+        $this->deviceId = $this->deviceType . $this->serial;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	public function getDeviceType()
-	{
-		if (empty($this->deviceType)) {
-			$this->deviceType = substr($this->deviceId, 0, 4);
-		}
+    public function getDeviceType()
+    {
+        if (empty($this->deviceType)) {
+            $this->deviceType = substr($this->deviceId, 0, 4);
+        }
 
-		return $this->deviceType;
-	}
+        return $this->deviceType;
+    }
 
-	public function setSerial($serial)
-	{
-		$this->serial = $serial;
-		$this->deviceId = $this->deviceType . $this->serial;
+    public function setSerial($serial)
+    {
+        $this->serial = $serial;
+        $this->deviceId = $this->deviceType . $this->serial;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	public function getSerial()
-	{
-		if (empty($this->serial)) {
-			$this->serial = substr($this->deviceId, 4, 4);
-		}
+    public function getSerial()
+    {
+        if (empty($this->serial)) {
+            $this->serial = substr($this->deviceId, 4, 4);
+        }
 
-		return $this->serial;
-	}
+        return $this->serial;
+    }
 
-	public function setData($data)
-	{
-		if (!ctype_xdigit($data)) {
-			$data = bin2hex($data);
-		}
-		$this->data = $data;
+    public function setData($data)
+    {
+        if (!ctype_xdigit($data)) {
+            $data = bin2hex($data);
+        }
+        $this->data = $data;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	public function getData()
-	{
-		return $this->data;
-	}
+    public function getData()
+    {
+        return $this->data;
+    }
 
-	public function getTimestamp()
-	{
-		return $this->timestamp;
-	}
+    public function getTimestamp()
+    {
+        return $this->timestamp;
+    }
 
-	public function getHelo()
-	{
-		$this->magic = static::MAGIC;
-		$this->unknown = str_pad('', 8, 'F');
-		$this->deviceId = str_pad('', 8, 'F');
-		$this->timestamp = str_pad('', 8, 'F');
-		$this->checksum = str_pad('', 32, 'F');
-		$this->data = '';
+    public function getHelo()
+    {
+        $this->magic = static::MAGIC;
+        $this->unknown = str_pad('', 8, 'F');
+        $this->deviceId = str_pad('', 8, 'F');
+        $this->timestamp = str_pad('', 8, 'F');
+        $this->checksum = str_pad('', 32, 'F');
+        $this->data = '';
 
-		return (string)$this;
-	}
+        return (string)$this;
+    }
 
-	/**
-	 * @param Device $device
-	 */
-	public function setDevice(Device $device)
-	{
-		$this
-			->setToken($device->getToken())
-			->setDeviceType($device->getDeviceType())
-			->setSerial($device->getSerial());
-	}
+    /**
+     * @param Device $device
+     * @return Packet
+     */
+    public function setDevice(Device $device)
+    {
+        $this
+            ->setToken($device->getToken())
+            ->setDeviceType($device->getDeviceType())
+            ->setSerial($device->getSerial())
+            ->setTimestamp($device->getTimeDelta() + time());
 
-	public function getLength()
-	{
-		$length = strlen(hex2bin($this->data)) + 32;
+        return $this;
+    }
 
-		return str_pad(dechex($length), 4, '0', STR_PAD_LEFT);
-	}
+    public function getLength()
+    {
+        $length = strlen(hex2bin($this->data)) + 32;
 
-	public function getChecksum()
-	{
-		return md5(
-			hex2bin($this->getHeader())
-			. hex2bin($this->token)
-			. hex2bin($this->data)
-		);
-	}
+        return str_pad(dechex($length), 4, '0', STR_PAD_LEFT);
+    }
 
-	private function getHeader()
-	{
-		$this->header = $this->magic
-			. $this->length
-			. $this->unknown
-			. $this->deviceId
-			. $this->timestamp;
+    public function getChecksum()
+    {
+        return md5(
+            hex2bin($this->getHeader())
+            . hex2bin($this->token)
+            . hex2bin($this->data)
+        );
+    }
 
-		return $this->header;
-	}
+    private function getHeader()
+    {
+        $this->header = $this->magic
+            . $this->length
+            . $this->unknown
+            . $this->deviceId
+            . $this->timestamp;
 
-	public function __toString()
-	{
-		$this->length = '0020';
+        return $this->header;
+    }
 
-		if (!empty($this->data)) {
-			$this->length = $this->getLength();
-			$this->checksum = $this->getChecksum();
-		}
+    public function __toString()
+    {
+        $this->length = '0020';
 
-		return $this->getHeader()
-			. $this->checksum
-			. $this->data;
-	}
+        if (!empty($this->data)) {
+            $this->length = $this->getLength();
+            $this->checksum = $this->getChecksum();
+        }
+
+        return $this->getHeader()
+            . $this->checksum
+            . $this->data;
+    }
 }

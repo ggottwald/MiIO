@@ -42,13 +42,20 @@ class MiIO
 
     /**
      * @param Device $device
-     * @return Promise
+     * @return array
      */
     public function getInfo(Device $device)
     {
-        $this->send($device, static::INFO);
+        return $this->send($device, static::INFO)
+            ->done(function ($response) {
+                if ($response instanceof Response) {
+                    return $response->getResult()[0];
+                }
 
-        return $this->read($device);
+                return null;
+            }, function ($rejected) {
+                // TODO: error handling
+            });
     }
 
     /**
@@ -87,6 +94,7 @@ class MiIO
      * @param Device $device
      * @param string $command
      * @param array  $params
+     * @return Promise
      */
     public function send(Device $device, $command, $params = [])
     {
@@ -111,13 +119,15 @@ class MiIO
             ->setDevice($device);
 
         $device->send((string)$packet);
+
+        return $this->read($device);
     }
 
     /**
      * @param Device $device
      * @return Promise
      */
-    public function read(Device $device)
+    protected function read(Device $device)
     {
         return new Promise(function (callable $resolve, callable $reject) use ($device) {
             $buf = $device->read();
