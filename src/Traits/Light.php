@@ -2,33 +2,19 @@
 
 namespace MiIO\Traits;
 
-use MiIO\MiIO;
-use MiIO\Models\Device;
 use MiIO\Models\Response;
 use React\Promise\Promise;
-use Socket\Raw\Factory;
 
 trait Light
 {
     /**
-     * @var MiIO
-     */
-    private $miIO;
-
-    public function __construct()
-    {
-        $this->miIO = new MiIO(new Factory());
-    }
-
-    /**
      * Get color in hex format
      *
-     * @param Device $device
      * @return string|null
      */
-    public function getRgb(Device $device)
+    public function getRgb()
     {
-        $hexValue = $this->getBrightnessAndRgb($device);
+        $hexValue = $this->getBrightnessAndRgb();
 
         if (strlen($hexValue) >= 7) {
             return strrev(substr(strrev($hexValue), 0, 6));
@@ -38,30 +24,28 @@ trait Light
     }
 
     /**
-     * @param Device     $device
      * @param int|string $value
      * @return Promise
      */
-    public function setRgb(Device $device, $value): Promise
+    public function setRgb($value): Promise
     {
         if (preg_match('/^[0-9a-f]{6}$/i', $value) === false) {
             $value = dechex($value);
         }
 
-        $bright = $this->getBrightness($device) ?? '01';
+        $bright = $this->getBrightness() ?? '01';
 
-        return $this->miIO->send($device, 'set_rgb', [hexdec($bright . $value)]);
+        return $this->send('set_rgb', [hexdec($bright . $value)]);
     }
 
     /**
      * Get current brightness in hex format
      *
-     * @param Device $device
      * @return string|null
      */
-    public function getBrightness(Device $device)
+    public function getBrightness()
     {
-        $hexValue = $this->getBrightnessAndRgb($device);
+        $hexValue = $this->getBrightnessAndRgb();
 
         if (strlen($hexValue) >= 7) {
             return strrev(substr(strrev($hexValue), 6));
@@ -73,29 +57,29 @@ trait Light
     /**
      * Set brightness in percent
      *
-     * @param Device     $device
      * @param int|string $value
      * @return Promise
      */
-    public function setBrightness(Device $device, $value): Promise
+    public function setBrightness($value): Promise
     {
         $bright = dechex($value);
-        $rgb = $this->getRgb($device) ?? 'ffffff';
+        $rgb    = $this->getRgb() ?? 'ffffff';
 
-        return $this->miIO->send($device, 'set_rgb', [hexdec($bright . $rgb)]);
+        return $this->send('set_rgb', [hexdec($bright . $rgb)]);
     }
 
     /**
      * Get brightness an color in hex format
      *
-     * @param Device $device
      * @return string|null
      */
-    public function getBrightnessAndRgb(Device $device)
+    public function getBrightnessAndRgb()
     {
         $result = null;
 
-        $this->miIO->send($device, 'get_prop', ['rgb'])
+        /** @var Promise $promise */
+        $promise = $this->send('get_prop', ['rgb']);
+        $promise
             ->done(function ($response) use (&$result) {
                 if ($response instanceof Response) {
                     $result = dechex($response->getResult()[0]);
@@ -110,26 +94,24 @@ trait Light
     /**
      * Set brightness and color in hex format
      *
-     * @param Device     $device
      * @param int|string $value
      * @return Promise
      */
-    public function setBrightnessAndRgb(Device $device, $value): Promise
+    public function setBrightnessAndRgb($value): Promise
     {
         if (preg_match('/^[0-9a-f]{7,8}$/i', $value) !== false) {
             $value = hexdec($value);
         }
 
-        return $this->miIO->send($device, 'set_rgb', [$value]);
+        return $this->send('set_rgb', [$value]);
     }
 
     /**
-     * @param Device $device
-     * @param bool   $on
+     * @param bool $on
      * @return Promise
      */
-    public function switchPower(Device $device, $on = true): Promise
+    public function switchPower($on = true): Promise
     {
-        return $this->setBrightness($device, $on ? 5 : 0);
+        return $this->setBrightness($on ? 5 : 0);
     }
 }
