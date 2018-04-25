@@ -7,7 +7,6 @@ use MiIO\Models\Packet;
 use MiIO\Models\Request;
 use MiIO\Models\Response;
 use React\Promise\Promise;
-use Socket\Raw\Factory;
 
 /**
  * Class MiIO
@@ -19,26 +18,6 @@ class MiIO
     const CACHE_KEY = 'MiIO';
 
     const INFO = 'miIO.info';
-
-    /**
-     * @var Factory
-     */
-    protected $socketFactory;
-
-    public function __construct(Factory $socketFactory)
-    {
-        $this->socketFactory = $socketFactory;
-    }
-
-    /**
-     * @param string $deviceName
-     * @param string $token
-     * @return Device
-     */
-    public function createDevice(string $deviceName, string $token)
-    {
-        return new Device($this->socketFactory->createUdp4(), $deviceName, $token);
-    }
 
     /**
      * @param Device $device
@@ -65,7 +44,7 @@ class MiIO
     private function init(Device &$device)
     {
         $packet = new Packet();
-        $helo = $packet->getHelo();
+        $helo   = $packet->getHelo();
 
         $device->send($helo);
         $response = $device->read();
@@ -102,7 +81,7 @@ class MiIO
             $this->init($device);
         }
 
-        $cacheKey = static::CACHE_KEY . $device->getIpAddress();
+        $cacheKey  = static::CACHE_KEY . $device->getIpAddress();
         $requestId = \Cache::increment($cacheKey);
 
         $request = new Request();
