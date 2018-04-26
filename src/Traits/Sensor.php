@@ -32,6 +32,18 @@ trait Sensor
 	 */
 	public function getHumidity()
 	{
+		$result = null;
 
+		$this
+			->send('get_prop', ['humidity'])
+			->done(function ($response) use (&$result) {
+				if ($response instanceof Response) {
+					$result = (int)$response->getResult()[0];
+				}
+			}, function ($rejected) {
+				// TODO: error handling
+			});
+
+		return $result;
 	}
 }
