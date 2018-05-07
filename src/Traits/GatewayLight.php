@@ -5,7 +5,7 @@ namespace MiIO\Traits;
 use MiIO\Models\Response;
 use React\Promise\Promise;
 
-trait Light
+trait GatewayLight
 {
     /**
      * Get color in hex format
@@ -110,7 +110,7 @@ trait Light
      * @param bool $on
      * @return Promise
      */
-    public function switchPower($on = true): Promise
+    public function setPower($on = true): Promise
     {
         return $this->setBrightness($on ? 5 : 0);
     }

@@ -2,9 +2,11 @@
 
 namespace MiIO\Devices;
 
+use MiIO\Contracts\PowerContract;
 use MiIO\Contracts\SensorContract;
 use MiIO\Models\AirPurifier\Properties;
 use MiIO\Models\Response;
+use MiIO\Traits\Power;
 use MiIO\Traits\Sensor;
 use React\Promise\Promise;
 
@@ -13,9 +15,10 @@ use React\Promise\Promise;
  *
  * @package MiIO\Devices
  */
-class AirPurifier extends BaseDevice implements SensorContract
+class AirPurifier extends BaseDevice implements SensorContract, PowerContract
 {
     use Sensor;
+    use Power;
 
     const MODE_IDLE     = 'idle';
     const MODE_AUTO     = 'auto';
@@ -42,15 +45,6 @@ class AirPurifier extends BaseDevice implements SensorContract
             });
 
         return $result;
-    }
-
-    /**
-     * @param bool $power
-     * @return Promise
-     */
-    public function setPower($power)
-    {
-        return $this->send('set_power', [$power ? 'on' : 'off']);
     }
 
     /**

@@ -2,8 +2,6 @@
 
 namespace MiIO\Contracts;
 
-use React\Promise\Promise;
-
 interface SensorContract
 {
 	/**
