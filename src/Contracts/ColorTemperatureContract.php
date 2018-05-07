@@ -4,20 +4,20 @@ namespace MiIO\Contracts;
 
 use React\Promise\Promise;
 
-interface DimmableLightContract
+interface ColorTemperatureContract
 {
     /**
-     * Get current brightness in hex format
+     * Get current color temperature
      *
      * @return string|null
      */
-    public function getBrightness();
+    public function getColorTemperature();
 
     /**
-     * Set brightness in percent
+     * Set color temperature
      *
      * @param int|string $value
      * @return Promise
      */
-    public function setBrightness($value);
+    public function setColorTemperature($value);
 }

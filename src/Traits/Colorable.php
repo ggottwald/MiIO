@@ -21,10 +21,8 @@ trait Colorable
         $promise
             ->done(function ($response) use (&$result) {
                 if ($response instanceof Response) {
-                    return $response->getResult()[0];
+                    $result = $response->getResult()[0];
                 }
-
-                return null;
             }, function ($rejected) {
                 // TODO: error handling
             });

@@ -10,7 +10,7 @@ trait Dimmable
     /**
      * Get brightness
      *
-     * @return string|null
+     * @return int|null
      */
     public function getBrightness()
     {
@@ -21,10 +21,8 @@ trait Dimmable
         $promise
             ->done(function ($response) use (&$result) {
                 if ($response instanceof Response) {
-                    return $response->getResult()[0];
+                    $result = (int)$response->getResult()[0];
                 }
-
-                return null;
             }, function ($rejected) {
                 // TODO: error handling
             });
