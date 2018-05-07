@@ -114,4 +114,14 @@ trait GatewayLight
     {
         return $this->setBrightness($on ? 5 : 0);
     }
+
+    /**
+     * Get current power state
+     *
+     * @return string|null
+     */
+    public function getPower()
+    {
+        return $this->getBrightness() > 0 ? 'on' : 'off';
+    }
 }
