@@ -6,6 +6,9 @@ use React\Promise\Promise;
 
 interface DimmableLightContract
 {
+    const EFFECT_SUDDEN = 'sudden';
+    const EFFECT_SMOOTH = 'smooth';
+
     /**
      * Get current brightness
      *
@@ -16,8 +19,10 @@ interface DimmableLightContract
     /**
      * Set brightness in percent
      *
-     * @param int|string $value
+     * @param int    $value
+     * @param string $effect
+     * @param int    $duration
      * @return Promise
      */
-    public function setBrightness($value);
+    public function setBrightness($value, $effect = self::EFFECT_SMOOTH, $duration = 1000);
 }

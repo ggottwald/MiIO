@@ -2,7 +2,6 @@
 
 namespace MiIO\Traits;
 
-use MiIO\Models\Response;
 use React\Promise\Promise;
 
 trait Colorable
@@ -14,20 +13,7 @@ trait Colorable
      */
     public function getRgb()
     {
-        $result = null;
-
-        /** @var Promise $promise */
-        $promise = $this->send('get_prop', ['color']);
-        $promise
-            ->done(function ($response) use (&$result) {
-                if ($response instanceof Response) {
-                    $result = $response->getResult()[0];
-                }
-            }, function ($rejected) {
-                // TODO: error handling
-            });
-
-        return $result;
+        return $this->getProperties()->color;
     }
 
     /**

@@ -10,4 +10,8 @@ use MiIO\Traits\GatewayLight;
 class Gateway extends BaseDevice implements ColorableLightContract, DimmableLightContract, PowerContract
 {
     use GatewayLight;
+
+    protected $properties = [
+        'rgb',
+    ];
 }

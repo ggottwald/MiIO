@@ -2,7 +2,7 @@
 
 namespace MiIO\Traits;
 
-use MiIO\Models\Response;
+use MiIO\Contracts\DimmableLightContract;
 use React\Promise\Promise;
 
 trait Dimmable
@@ -14,30 +14,19 @@ trait Dimmable
      */
     public function getBrightness()
     {
-        $result = null;
-
-        /** @var Promise $promise */
-        $promise = $this->send('get_prop', ['bright']);
-        $promise
-            ->done(function ($response) use (&$result) {
-                if ($response instanceof Response) {
-                    $result = (int)$response->getResult()[0];
-                }
-            }, function ($rejected) {
-                // TODO: error handling
-            });
-
-        return $result;
+        return (int)$this->getProperties()->bright;
     }
 
     /**
      * Set brightness
      *
-     * @param int|string $value
+     * @param int    $value
+     * @param string $effect
+     * @param int    $duration
      * @return Promise
      */
-    public function setBrightness($value): Promise
+    public function setBrightness($value, $effect = DimmableLightContract::EFFECT_SMOOTH, $duration = 1000): Promise
     {
-        return $this->send('set_bright', [$value]);
+        return $this->send('set_bright', [(int)$value, $effect, $duration]);
     }
 }

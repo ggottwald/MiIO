@@ -44,6 +44,11 @@ class Factory
         return new class($device) extends BaseDevice implements SensorContract
         {
             use Sensor;
+
+            protected $properties = [
+                'temp_dec',
+                'humidity',
+            ];
         };
     }
 
