@@ -4,6 +4,8 @@ namespace MiIO\Devices;
 
 use MiIO\MiIO;
 use MiIO\Models\Device;
+use MiIO\Models\Properties;
+use MiIO\Models\Response;
 use React\Promise\Promise;
 
 /**
@@ -21,6 +23,11 @@ abstract class BaseDevice
      * @var MiIO
      */
     protected $miIO;
+
+    /**
+     * @var array
+     */
+    protected $properties = [];
 
     /**
      * MiRobot constructor.
@@ -67,5 +74,24 @@ abstract class BaseDevice
         $this->device->setName($name);
 
         return $this;
+    }
+
+    /**
+     * @return Properties
+     */
+    public function getProperties()
+    {
+        $this->send('get_prop', $this->properties)
+            ->done(function ($response) use (&$result) {
+                if ($response instanceof Response) {
+                    $properties = array_combine($this->properties, $response->getResult());
+
+                    $result = new Properties($properties);
+                }
+            }, function ($rejected) {
+                // TODO: error handling
+            });
+
+        return $result;
     }
 }

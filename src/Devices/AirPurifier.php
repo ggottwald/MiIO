@@ -4,8 +4,6 @@ namespace MiIO\Devices;
 
 use MiIO\Contracts\PowerContract;
 use MiIO\Contracts\SensorContract;
-use MiIO\Models\AirPurifier\Properties;
-use MiIO\Models\Response;
 use MiIO\Traits\Power;
 use MiIO\Traits\Sensor;
 use React\Promise\Promise;
@@ -25,27 +23,22 @@ class AirPurifier extends BaseDevice implements SensorContract, PowerContract
     const MODE_SILENT   = 'silent';
     const MODE_FAVORITE = 'favorite';
 
-    /**
-     * @return Properties
-     */
-    public function getProperties()
-    {
-        $result = new Properties();
-        $params = $result->getAttributes();
-
-        $this->send('get_prop', $params)
-            ->done(function ($response) use ($params, &$result) {
-                if ($response instanceof Response) {
-                    $attributes = array_combine($params, $response->getResult());
-
-                    $result = new Properties($attributes);
-                }
-            }, function ($rejected) {
-                // TODO: error handling
-            });
-
-        return $result;
-    }
+    protected $properties = [
+        'power',
+        'mode',
+        'temp_dec',
+        'humidity',
+        'aqi',
+        'favorite_level',
+        'filter1_life',
+        'f1_hour_used',
+        'use_time',
+        'led',
+        'led_b',
+        'buzzer',
+        'purify_volume',
+        'learn_mode',
+    ];
 
     /**
      * @param string $mode

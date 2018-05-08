@@ -2,7 +2,7 @@
 
 namespace MiIO\Traits;
 
-use MiIO\Models\Response;
+use MiIO\Contracts\DimmableLightContract;
 use React\Promise\Promise;
 
 trait GatewayLight
@@ -57,10 +57,12 @@ trait GatewayLight
     /**
      * Set brightness in percent
      *
-     * @param int|string $value
+     * @param int    $value
+     * @param string $effect
+     * @param int    $duration
      * @return Promise
      */
-    public function setBrightness($value): Promise
+    public function setBrightness($value, $effect = DimmableLightContract::EFFECT_SMOOTH, $duration = 1000): Promise
     {
         $bright = dechex($value);
         $rgb    = $this->getRgb() ?? 'ffffff';
@@ -75,20 +77,7 @@ trait GatewayLight
      */
     public function getBrightnessAndRgb()
     {
-        $result = null;
-
-        /** @var Promise $promise */
-        $promise = $this->send('get_prop', ['rgb']);
-        $promise
-            ->done(function ($response) use (&$result) {
-                if ($response instanceof Response) {
-                    $result = dechex($response->getResult()[0]);
-                }
-            }, function ($rejected) {
-                // TODO: error handling
-            });
-
-        return $result;
+        return dechex($this->getProperties()->rgb);
     }
 
     /**

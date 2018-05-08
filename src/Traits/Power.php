@@ -2,7 +2,6 @@
 
 namespace MiIO\Traits;
 
-use MiIO\Models\Response;
 use React\Promise\Promise;
 
 trait Power
@@ -21,19 +20,6 @@ trait Power
      */
     public function getPower()
     {
-        $result = null;
-
-        /** @var Promise $promise */
-        $promise = $this->send('get_prop', ['power']);
-        $promise
-            ->done(function ($response) use (&$result) {
-                if ($response instanceof Response) {
-                    $result = $response->getResult()[0];
-                }
-            }, function ($rejected) {
-                // TODO: error handling
-            });
-
-        return $result;
+        return $this->getProperties()->power;
     }
 }
