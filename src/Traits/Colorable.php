@@ -13,7 +13,7 @@ trait Colorable
      */
     public function getRgb()
     {
-        return $this->getProperties()->color;
+        return $this->getProperties()->rgb;
     }
 
     /**

@@ -17,4 +17,10 @@ class PhilipsLightBulb extends BaseDevice implements PowerContract, DimmableLigh
     use Power;
     use Dimmable;
     use ColorTemperature;
+
+    protected $properties = [
+        'power',
+        'bright',
+        'cct',
+    ];
 }
