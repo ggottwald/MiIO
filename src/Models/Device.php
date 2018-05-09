@@ -3,6 +3,7 @@
 namespace MiIO\Models;
 
 use MiIO\Crypt;
+use Socket\Raw\Exception;
 use Socket\Raw\Socket;
 
 /**
@@ -73,9 +74,9 @@ class Device
 
     public function __construct(Socket $socket, string $deviceName, string $token)
     {
-        $this->socket = $socket;
+        $this->socket     = $socket;
         $this->deviceName = $deviceName;
-        $this->token = $token;
+        $this->token      = $token;
     }
 
     /**
@@ -334,6 +335,7 @@ class Device
 
     /**
      * @return string
+     * @throws Exception
      */
     public function read()
     {

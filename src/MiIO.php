@@ -7,6 +7,7 @@ use MiIO\Models\Packet;
 use MiIO\Models\Request;
 use MiIO\Models\Response;
 use React\Promise\Promise;
+use Socket\Raw\Exception;
 
 /**
  * Class MiIO
@@ -40,6 +41,7 @@ class MiIO
     /**
      * @param Device $device
      * @return Device|null
+     * @throws Exception
      */
     private function init(Device &$device)
     {
@@ -74,6 +76,7 @@ class MiIO
      * @param string $command
      * @param array  $params
      * @return Promise
+     * @throws Exception
      */
     public function send(Device $device, $command, $params = [])
     {
@@ -105,6 +108,7 @@ class MiIO
     /**
      * @param Device $device
      * @return Promise
+     * @throws Exception
      */
     protected function read(Device $device)
     {
