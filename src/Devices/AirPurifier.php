@@ -48,4 +48,13 @@ class AirPurifier extends BaseDevice implements SensorContract, PowerContract
     {
         return $this->send('set_mode', [$mode]);
     }
+
+    /**
+     * @param int $level
+     * @return Promise
+     */
+    public function setFavoriteLevel($level)
+    {
+        return $this->send('set_level_favorite', [$level]);
+    }
 }
