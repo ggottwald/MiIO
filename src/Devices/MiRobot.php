@@ -6,6 +6,7 @@ use MiIO\Models\MiRobot\Consumable;
 use MiIO\Models\MiRobot\Status;
 use MiIO\Models\Response;
 use React\Promise\Promise;
+use Socket\Raw\Exception;
 
 /**
  * Class MiRobot
@@ -50,6 +51,7 @@ class MiRobot extends BaseDevice
 
     /**
      * @return Promise
+     * @throws Exception
      */
     public function setMode(): Promise
     {
@@ -86,6 +88,7 @@ class MiRobot extends BaseDevice
      * @param string $name
      * @param array  $arguments
      * @return Status|Consumable|null
+     * @throws Exception
      */
     public function __call($name, $arguments)
     {

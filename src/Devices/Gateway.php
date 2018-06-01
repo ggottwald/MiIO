@@ -6,6 +6,7 @@ use MiIO\Contracts\DimmableLightContract;
 use MiIO\Contracts\PowerContract;
 use MiIO\Contracts\ColorableLightContract;
 use React\Promise\Promise;
+use Socket\Raw\Exception;
 
 class Gateway extends BaseDevice implements ColorableLightContract, DimmableLightContract, PowerContract
 {
@@ -32,6 +33,7 @@ class Gateway extends BaseDevice implements ColorableLightContract, DimmableLigh
     /**
      * @param int|string $value
      * @return Promise
+     * @throws Exception
      */
     public function setRgb($value): Promise
     {
@@ -67,6 +69,7 @@ class Gateway extends BaseDevice implements ColorableLightContract, DimmableLigh
      * @param string $effect
      * @param int    $duration
      * @return Promise
+     * @throws Exception
      */
     public function setBrightness($value, $effect = DimmableLightContract::EFFECT_SMOOTH, $duration = 1000): Promise
     {
@@ -91,6 +94,7 @@ class Gateway extends BaseDevice implements ColorableLightContract, DimmableLigh
      *
      * @param int|string $value
      * @return Promise
+     * @throws Exception
      */
     public function setBrightnessAndRgb($value): Promise
     {

@@ -7,6 +7,7 @@ use MiIO\Contracts\SensorContract;
 use MiIO\Traits\Power;
 use MiIO\Traits\Sensor;
 use React\Promise\Promise;
+use Socket\Raw\Exception;
 
 /**
  * Class AirPurifier
@@ -43,6 +44,7 @@ class AirPurifier extends BaseDevice implements SensorContract, PowerContract
     /**
      * @param string $mode
      * @return Promise
+     * @throws Exception
      */
     public function setMode($mode)
     {
@@ -52,6 +54,7 @@ class AirPurifier extends BaseDevice implements SensorContract, PowerContract
     /**
      * @param int $level
      * @return Promise
+     * @throws Exception
      */
     public function setFavoriteLevel($level)
     {
