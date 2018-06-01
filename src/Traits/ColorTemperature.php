@@ -3,6 +3,7 @@
 namespace MiIO\Traits;
 
 use React\Promise\Promise;
+use Socket\Raw\Exception;
 
 trait ColorTemperature
 {
@@ -10,6 +11,7 @@ trait ColorTemperature
      * Get color temperature
      *
      * @return int|null
+     * @throws Exception
      */
     public function getColorTemperature()
     {
@@ -19,6 +21,7 @@ trait ColorTemperature
     /**
      * @param int|string $value
      * @return Promise
+     * @throws Exception
      */
     public function setColorTemperature($value): Promise
     {

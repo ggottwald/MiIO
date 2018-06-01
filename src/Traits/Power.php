@@ -3,12 +3,14 @@
 namespace MiIO\Traits;
 
 use React\Promise\Promise;
+use Socket\Raw\Exception;
 
 trait Power
 {
     /**
      * @param bool $on
      * @return Promise
+     * @throws Exception
      */
     public function setPower($on = true)
     {
@@ -17,6 +19,7 @@ trait Power
 
     /**
      * @return string
+     * @throws Exception
      */
     public function getPower()
     {

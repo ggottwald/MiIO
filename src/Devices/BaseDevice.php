@@ -7,6 +7,7 @@ use MiIO\Models\Device;
 use MiIO\Models\Properties;
 use MiIO\Models\Response;
 use React\Promise\Promise;
+use Socket\Raw\Exception;
 
 /**
  * Class BaseDevice
@@ -43,6 +44,7 @@ abstract class BaseDevice
      * @param string $command
      * @param array  $params
      * @return Promise
+     * @throws Exception
      */
     public function send($command, $params = [])
     {
@@ -78,6 +80,7 @@ abstract class BaseDevice
 
     /**
      * @return Properties
+     * @throws Exception
      */
     public function getProperties()
     {

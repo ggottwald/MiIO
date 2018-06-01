@@ -4,6 +4,7 @@ namespace MiIO\Traits;
 
 use MiIO\Contracts\DimmableLightContract;
 use React\Promise\Promise;
+use Socket\Raw\Exception;
 
 trait Dimmable
 {
@@ -11,6 +12,7 @@ trait Dimmable
      * Get brightness
      *
      * @return int|null
+     * @throws Exception
      */
     public function getBrightness()
     {
@@ -24,6 +26,7 @@ trait Dimmable
      * @param string $effect
      * @param int    $duration
      * @return Promise
+     * @throws Exception
      */
     public function setBrightness($value, $effect = DimmableLightContract::EFFECT_SMOOTH, $duration = 1000): Promise
     {
