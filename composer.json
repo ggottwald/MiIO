@@ -6,7 +6,6 @@
     "php": ">=7.0",
     "clue/socket-raw": "~1.2",
     "react/promise": "^2.5",
-    "predis/predis": "^1.1",
     "ext-json": "*"
   },
   "license": "GNU AFFERO GENERAL PUBLIC LICENSE",
