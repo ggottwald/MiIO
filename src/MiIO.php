@@ -6,6 +6,7 @@ use MiIO\Models\Device;
 use MiIO\Models\Packet;
 use MiIO\Models\Request;
 use MiIO\Models\Response;
+use Predis\Client;
 use React\Promise\Promise;
 use Socket\Raw\Exception;
 
@@ -85,7 +86,7 @@ class MiIO
         }
 
         $cacheKey  = static::CACHE_KEY . $device->getIpAddress();
-        $requestId = \Cache::increment($cacheKey);
+        $requestId = $this->incrementRequestId($cacheKey);
 
         $request = new Request();
         $request
@@ -133,5 +134,18 @@ class MiIO
             }
             $reject($response->getException());
         });
+    }
+
+    /**
+     * @param string $cacheKey
+     * @return int
+     */
+    private function incrementRequestId($cacheKey)
+    {
+        if (class_exists(\Cache::class)) {
+            return \Cache::increment($cacheKey);
+        }
+
+        return (new Client())->incr($cacheKey);
     }
 }

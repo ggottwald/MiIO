@@ -28,6 +28,7 @@ class Status implements \JsonSerializable
         13  => 'Shutting down',
         14  => 'Updating',
         15  => 'Docking',
+        17  => 'In zoned cleanup',
         100 => 'Full',
     ];
 
