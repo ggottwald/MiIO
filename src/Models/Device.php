@@ -72,11 +72,23 @@ class Device
      */
     protected $socket;
 
-    public function __construct(Socket $socket, string $deviceName, string $token)
+    /**
+     * Device constructor.
+     * @param Socket $socket
+     * @param string $ipOrDeviceName
+     * @param string $token
+     */
+    public function __construct(Socket $socket, string $ipOrDeviceName, string $token)
     {
-        $this->socket     = $socket;
-        $this->deviceName = $deviceName;
-        $this->token      = $token;
+        $this->socket = $socket;
+
+        if (filter_var($ipOrDeviceName, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) !== false) {
+            $this->ipAddress = $ipOrDeviceName;
+        } else {
+            $this->deviceName = $ipOrDeviceName;
+        }
+
+        $this->token = $token;
     }
 
     /**
@@ -140,6 +152,10 @@ class Device
      */
     public function getDeviceName(): string
     {
+        if (empty($this->deviceName) && !empty($this->ipAddress)) {
+            $this->deviceName = gethostbyaddr($this->ipAddress);
+        }
+
         return $this->deviceName;
     }
 

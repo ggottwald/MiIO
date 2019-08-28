@@ -19,13 +19,13 @@ use MiIO\Traits\Sensor;
 class Factory
 {
     /**
-     * @param string $deviceName
+     * @param string $ipOrDeviceName
      * @param string $token
      * @return BaseDevice
      */
-    public static function device(string $deviceName, string $token)
+    public static function device(string $ipOrDeviceName, string $token)
     {
-        $device = self::getDevice($deviceName, $token);
+        $device = self::getDevice($ipOrDeviceName, $token);
 
         return new class($device) extends BaseDevice
         {
@@ -33,13 +33,13 @@ class Factory
     }
 
     /**
-     * @param string $deviceName
+     * @param string $ipOrDeviceName
      * @param string $token
      * @return SensorContract
      */
-    public static function sensorDevice(string $deviceName, string $token)
+    public static function sensorDevice(string $ipOrDeviceName, string $token)
     {
-        $device = self::getDevice($deviceName, $token);
+        $device = self::getDevice($ipOrDeviceName, $token);
 
         return new class($device) extends BaseDevice implements SensorContract
         {
@@ -53,54 +53,54 @@ class Factory
     }
 
     /**
-     * @param string $deviceName
+     * @param string $ipOrDeviceName
      * @param string $token
      * @return AirPurifier
      */
-    public static function airPurifier(string $deviceName, string $token)
+    public static function airPurifier(string $ipOrDeviceName, string $token)
     {
-        return new AirPurifier(self::getDevice($deviceName, $token));
+        return new AirPurifier(self::getDevice($ipOrDeviceName, $token));
     }
 
     /**
-     * @param string $deviceName
+     * @param string $ipOrDeviceName
      * @param string $token
      * @return Gateway
      */
-    public static function gateway(string $deviceName, string $token)
+    public static function gateway(string $ipOrDeviceName, string $token)
     {
-        return new Gateway(self::getDevice($deviceName, $token));
+        return new Gateway(self::getDevice($ipOrDeviceName, $token));
     }
 
     /**
-     * @param string $deviceName
+     * @param string $ipOrDeviceName
      * @param string $token
      * @return MiRobot
      */
-    public static function miRobot(string $deviceName, string $token)
+    public static function miRobot(string $ipOrDeviceName, string $token)
     {
-        return new MiRobot(self::getDevice($deviceName, $token));
+        return new MiRobot(self::getDevice($ipOrDeviceName, $token));
     }
 
     /**
-     * @param string $deviceName
+     * @param string $ipOrDeviceName
      * @param string $token
      * @return PhilipsLightBulb
      */
-    public static function philipsLightBulb(string $deviceName, string $token)
+    public static function philipsLightBulb(string $ipOrDeviceName, string $token)
     {
-        return new PhilipsLightBulb(self::getDevice($deviceName, $token));
+        return new PhilipsLightBulb(self::getDevice($ipOrDeviceName, $token));
     }
 
     /**
-     * @param string $deviceName
+     * @param string $ipOrDeviceName
      * @param string $token
      * @return Device
      */
-    protected static function getDevice($deviceName, $token)
+    protected static function getDevice($ipOrDeviceName, $token)
     {
         $socketFactory = new \Socket\Raw\Factory();
 
-        return new Device($socketFactory->createUdp4(), $deviceName, $token);
+        return new Device($socketFactory->createUdp4(), $ipOrDeviceName, $token);
     }
 }
