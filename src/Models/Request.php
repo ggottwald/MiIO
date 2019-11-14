@@ -91,7 +91,7 @@ class Request
             'method' => $this->method,
         ];
 
-        if (is_array($this->params) && count($this->params)) {
+        if (is_array($this->params)) {
             $value['params'] = $this->params;
         }
 
