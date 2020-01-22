@@ -82,11 +82,13 @@ class MiIO
             $this->init($device);
         }
 
+        $requestId = round((microtime(true) - mktime(0, 0, 0)) * 1000);
+
         $request = new Request();
         $request
             ->setMethod($command)
             ->setParams($params)
-            ->setId(time());
+            ->setId($requestId);
 
         $data = $device->encrypt($request);
 
